@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+status: {
+    1: 보통
+    2: 삭제
+}
+-->
+<mapper namespace="user">
+    <select id="selectList" resultType="java.util.HashMap">
+        select * from kakao_users where status = 1
+    </select>
+
+    <select id="select" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from kakao_users
+        where user_id = #{user_id} and status = 1
+    </select>
+
+    <insert id="insert" parameterType="com.demo.kakao.vo.UserVO">
+        insert into kakao_users
+        (
+         user_id,
+         provider,
+         name,
+         profile_image,
+         background_image,
+         status,
+         createat
+        )
+        VALUES
+        (
+         #{userId},
+         #{provider},
+         #{name},
+         #{profileImage, jdbcType=VARCHAR},
+         #{backgroundImage, jdbcType=VARCHAR},
+         1,
+         sysdate
+        )
+    </insert>
+
+    <update id="update" parameterType="com.demo.kakao.vo.UserVO">
+        update kakao_users
+        set
+        <if test="name != '' and name != null">
+            name = #{name, jdbcType=VARCHAR},
+        </if>
+        <if test="profileImage != '' and profileImage != null">
+            profile_image = #{profileImage, jdbcType=VARCHAR},
+        </if>
+        <if test="backgroundImage != '' and backgroundImage != null">
+            background_image = #{backgroundImage, jdbcType=VARCHAR},
+        </if>
+        updateAt = sysdate
+        where user_id = #{userId}
+    </update>
+
+    <update id="delete" parameterType="java.lang.String">
+        update kakao_users
+        set status = 2,
+        updateAt = sysdate
+        where user_id = #{userId}
+    </update>
+</mapper>

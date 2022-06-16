@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+status: {
+    1: 보통
+    2: 차단
+    3: 삭제
+}
+-->
+
+<mapper namespace="friend">
+    <!-- from_id || to_id 의 차단 여부 -->
+    <sql id="CUTOFF_RS">
+        WITH CUTOFF_RS AS (select FR.*,
+        case when (select count(*)
+        from kakao_friends
+        where STATUS = 2
+        <choose>
+            <when test='"${target}".equals("from")'>
+                AND from_id =FR.to_id
+                AND to_id = FR.from_id
+            </when >
+            <when test='"${target}".equals("to")'>
+                AND from_id = FR.from_id
+                AND to_id = FR.to_id
+            </when>
+        </choose> ) &lt;= 0 then '1'
+        else '2' END AS CUTOFF_RS
+        from kakao_friends FR
+        where
+        <choose>
+            <when test='"${target}".equals("from")'>
+                from_id = #{userId})
+            </when >
+            <when test='"${target}".equals("to")'>
+                to_id = #{userId})
+            </when>
+        </choose>
+    </sql>
+
+    <!--  출력  -->
+    <sql id="CUTOFF_RS_SELECT_USER">
+        A.USER_ID,
+        A.NAME,
+        DECODE(B.CUTOFF_RS,'1' , A.PROVIDER , null) AS PROVIDER,
+        DECODE(B.CUTOFF_RS,'1' , A.PROFILE_IMAGE , null) AS PROFILE_IMAGE,
+        DECODE(B.CUTOFF_RS,'1' , A.BACKGROUND_IMAGE , null) AS BACKGROUND_IMAGE,
+        DECODE(B.CUTOFF_RS,'1' , A.STATUS , null) AS STATUS_US,
+        DECODE(B.CUTOFF_RS,'1' , A.CREATEAT , null) AS CREATEAT_US,
+        DECODE(B.CUTOFF_RS,'1' , A.UPDATEAT , null) AS UPDATEAT_US
+    </sql>
+
+    <!--  내가 추가한 친구  -->
+    <select id="selectFromIdList" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+        <include refid="CUTOFF_RS">
+            <property name="userId" value="userId"/>
+            <property name="target" value="from"/>
+        </include>
+        select
+        <include refid="CUTOFF_RS_SELECT_USER"></include>
+        from kakao_users A
+        JOIN CUTOFF_RS B
+        ON A.user_id = B.TO_ID
+        where B.status = 1
+        and A.status = 1
+    </select>
+
+    <!-- 나를 추가한 친구 ( -나는 추가하지 않은 친구 ) -->
+    <!-- 수정 필요 -->
+    <select id="selectToIdList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        <include refid="CUTOFF_RS">
+            <property name="userId" value="userId"/>
+            <property name="target" value="to"/>
+        </include>
+        select
+        <include refid="CUTOFF_RS_SELECT_USER"></include>
+        from kakao_users A
+        join CUTOFF_RS B
+        on B.from_id = A.user_id
+        where A.status = 1
+        and B.status = 1
+        and from_id not in
+        (select to_id
+        from kakao_friends
+        where from_id = #{userId} )
+    </select>
+
+    <!--  차단 목록  -->
+    <select id="selectDeleteList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        <include refid="CUTOFF_RS">
+            <property name="userId" value="userId"/>
+            <property name="target" value="from"/>
+        </include>
+        select
+        <include refid="CUTOFF_RS_SELECT_USER"/>
+        from kakao_users A
+        join CUTOFF_RS B
+        on A.user_id = B.to_id
+        where B.status = 2
+        and A.status = 1
+    </select>
+
+    <!--  유저 입력  -->
+    <insert id="insert" parameterType="com.demo.kakao.vo.FriendVO">
+        insert into kakao_friends
+        (
+         friend_id,
+         from_id,
+         to_id,
+         nickname,
+         status,
+         createAt
+        )
+        values
+        (
+         kakao_friends_seq.nextval,
+         #{fromId},
+         #{toId},
+         #{nickname},
+         1,
+         sysdate
+        )
+    </insert>
+
+    <!--  유저 별명 설정   -->
+    <update id="update" parameterType="com.demo.kakao.vo.FriendVO">
+        update kakao_friends
+        <if test="nickname != '' and nickname != null">
+            set nickname = #{nickname},
+        </if>
+        <if test="status != '' and status != null">
+            status = #{status, jdbcType=INTEGER},
+        </if>
+        updateAt = sysdate
+        where friend_id = #{friendId}
+    </update>
+
+    <!--  삭제  -->
+    <update id="delete" parameterType="com.demo.kakao.vo.FriendVO">
+        update kakao_friends
+        set status = 3,
+        updateAt = sysdate
+        where friend_id = #{friendId}
+    </update>
+
+</mapper>
+
+
+
+
+
+
+
+

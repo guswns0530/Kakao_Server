@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--
+status: {
+    1: 보통
+    2: 삭제
+}
+
+type: {
+    1: 개인
+    2: 단체
+}
+-->
+
+<mapper namespace="room">
+    <insert id="insert" parameterType="com.demo.kakao.vo.RoomVO">
+        insert into kakao_rooms
+        (
+            room_id
+            name,
+            type,
+            status,
+            createAt,
+        )
+        VALUES
+            (
+                #{roomId},
+                #{name},
+                #{type},
+                #{profileImage, jdbcType=VARCHAR},
+                sysdate
+            )
+    </insert>
+
+    <delete id="delete" parameterType="com.demo.kakao.vo.RoomVO">
+        delete
+        kakao_rooms
+        where room_id = ${roomId}
+    </delete>
+</mapper>
