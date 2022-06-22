@@ -53,6 +53,4 @@ type: {
           AND A.status = 1
           AND B.status = 1;
     </select>
-
-
 </mapper>

@@ -19,7 +19,7 @@ class FriendDAOTest {
     public void selectFromIdList() {
         Map<String, Object> map = new HashMap<>();
 
-        String userId = "admin";
+        String userId = "test1";
         map.put("userId", userId);
 
         List<Map<String, Object>> maps = friendDAO.selectFromIdList(map);
@@ -30,7 +30,7 @@ class FriendDAOTest {
     public void selectToIdList() {
         Map<String, Object> map = new HashMap<>();
 
-        String userId = "admin";
+        String userId = "test3";
         map.put("userId", userId);
 
 

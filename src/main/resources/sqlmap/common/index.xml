@@ -32,9 +32,11 @@
         </choose>
     </sql>
 
+    <!--  출력  -->
     <sql id="CUTOFF_RS_SELECT_USER">
         A.USER_ID,
         A.NAME,
+        B.NICKNAME,
         DECODE(B.CUTOFF_RS,'1' , A.PROVIDER , null) AS PROVIDER,
         DECODE(B.CUTOFF_RS,'1' , A.PROFILE_IMAGE , null) AS PROFILE_IMAGE,
         DECODE(B.CUTOFF_RS,'1' , A.BACKGROUND_IMAGE , null) AS BACKGROUND_IMAGE,
