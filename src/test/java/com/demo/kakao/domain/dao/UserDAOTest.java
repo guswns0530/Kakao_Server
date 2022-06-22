@@ -1,11 +1,11 @@
-package com.demo.kakao.dao;
+package com.demo.kakao.domain.dao;
 
-import com.demo.kakao.vo.UserVO;
+import com.demo.kakao.domain.dao.UserDAO;
+import com.demo.kakao.domain.vo.UserVO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 import java.util.Map;

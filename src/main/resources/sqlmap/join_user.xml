@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--
+status: {
+    1: 보통
+    2: 삭제
+}
+
+type: {
+    1: 개인
+    2: 단체
+}
+-->
+
+<mapper namespace="join_user">
+    <insert id="insert" parameterType="com.demo.kakao.domain.vo.JoinUserVO">
+        insert into kakao_join_users
+        (
+         join_id,
+         user_id,
+         room_id,
+         status,
+         createAt
+         )
+        VALUES
+        (
+         kakao_join_users_seq.nextval,
+         #{userId},
+         #{roomId},
+         1,
+         sysdate
+        )
+    </insert>
+
+    <update id="delete" parameterType="com.demo.kakao.domain.vo.JoinUserVO">
+        update kakao_join_users
+        set status = 2,
+            updateAt = sysdate
+        where join_id = #{joinId}
+    </update>
+</mapper>

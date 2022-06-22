@@ -1,17 +1,14 @@
-package com.demo.kakao.dao;
+package com.demo.kakao.domain.dao;
 
-import com.demo.kakao.vo.FriendVO;
-import com.demo.kakao.vo.UserVO;
+import com.demo.kakao.domain.vo.FriendVO;
 import lombok.RequiredArgsConstructor;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
 @RequiredArgsConstructor
 @Repository
 public class FriendDAO {

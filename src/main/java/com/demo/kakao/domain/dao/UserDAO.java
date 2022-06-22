@@ -1,11 +1,8 @@
-package com.demo.kakao.dao;
+package com.demo.kakao.domain.dao;
 
-import com.demo.kakao.vo.UserVO;
-import lombok.AllArgsConstructor;
+import com.demo.kakao.domain.vo.UserVO;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.ConstructorArgs;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

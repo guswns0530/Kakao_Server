@@ -1,6 +1,7 @@
-package com.demo.kakao.dao;
+package com.demo.kakao.domain.dao;
 
-import com.demo.kakao.vo.FriendVO;
+import com.demo.kakao.domain.dao.FriendDAO;
+import com.demo.kakao.domain.vo.FriendVO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class FriendDAOTest {

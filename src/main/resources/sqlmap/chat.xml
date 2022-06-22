@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chat">
+    <insert id="insert">
+        insert into kakao_chats
+        (
+         chat_id,
+         join_id,
+         room_id,
+         status,
+         type,
+         content,
+         createAt
+         )
+        values
+        (
+         kakao_chats_seq.nextval,
+         #{joinId},
+         #{roomId},
+         1,
+         #{type},
+         #{content}
+         SYSDATE
+         )
+    </insert>
+
+    <update id="delete">
+        update kakao_chats
+        set status = 2,
+            updateAt = sysdate
+        where chat_id = #{chatId}
+    </update>
+
+</mapper>

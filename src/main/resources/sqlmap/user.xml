@@ -17,7 +17,7 @@ status: {
         where user_id = #{user_id} and status = 1
     </select>
 
-    <insert id="insert" parameterType="com.demo.kakao.vo.UserVO">
+    <insert id="insert" parameterType="com.demo.kakao.domain.vo.UserVO">
         insert into kakao_users
         (
          user_id,
@@ -40,7 +40,7 @@ status: {
         )
     </insert>
 
-    <update id="update" parameterType="com.demo.kakao.vo.UserVO">
+    <update id="update" parameterType="com.demo.kakao.domain.vo.UserVO">
         update kakao_users
         set
         <if test="name != '' and name != null">

@@ -102,7 +102,7 @@ status: {
     </select>
 
     <!--  유저 입력  -->
-    <insert id="insert" parameterType="com.demo.kakao.vo.FriendVO">
+    <insert id="insert" parameterType="com.demo.kakao.domain.vo.FriendVO">
         insert into kakao_friends
         (
          friend_id,
@@ -124,7 +124,7 @@ status: {
     </insert>
 
     <!--  유저 별명 설정   -->
-    <update id="update" parameterType="com.demo.kakao.vo.FriendVO">
+    <update id="update" parameterType="com.demo.kakao.domain.vo.FriendVO">
         update kakao_friends
         <if test="nickname != '' and nickname != null">
             set nickname = #{nickname},
@@ -137,7 +137,7 @@ status: {
     </update>
 
     <!--  삭제  -->
-    <update id="delete" parameterType="com.demo.kakao.vo.FriendVO">
+    <update id="delete" parameterType="com.demo.kakao.domain.vo.FriendVO">
         update kakao_friends
         set status = 3,
         updateAt = sysdate

@@ -1,4 +1,4 @@
-package com.demo.kakao.vo;
+package com.demo.kakao.domain.vo;
 
 import lombok.Data;
 
