@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -23,10 +26,10 @@ class RoomDAOTest {
 
     @Test
     void delete() {
-        RoomVO vo = new RoomVO();
+        Map<String, String> map = new HashMap<>();
 
-        vo.setRoomId("1");
+        map.put("roomId", "1");
 
-        roomDAO.delete(vo);
+        roomDAO.delete(map);
     }
 }

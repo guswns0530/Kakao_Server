@@ -2,6 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="chat">
+
+    <select id="last_chat_select" parameterType="java.util.HashMap">
+        select *
+        from (select content
+              from kakao_chats
+                join kakao_rooms using(room_id)
+              where room_id = #{roomId}
+              order by kakao_chats.createAT desc)
+        where rownum = 1;
+    </select>
+
     <insert id="insert">
         insert into kakao_chats
         (
@@ -31,5 +42,4 @@
             updateAt = sysdate
         where chat_id = #{chatId}
     </update>
-
 </mapper>

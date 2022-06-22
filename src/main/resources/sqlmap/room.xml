@@ -34,10 +34,25 @@ type: {
             )
     </insert>
 
-    <update id="delete" parameterType="com.demo.kakao.domain.vo.RoomVO">
+    <update id="delete" parameterType="java.util.HashMap">
         update kakao_rooms
         set status = 2,
             updateAt = sysdate
         where room_id = #{roomId}
     </update>
+
+    <select id="selectRoomList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+            B.ROOM_ID AS ROOM_ID,
+            B.NAME AS NAME,
+            B.TYPE AS TYPE
+        from kakao_join_users A
+         join kakao_rooms B
+          on A.room_id = B.room_id
+        where user_id = #{userId}
+          AND A.status = 1
+          AND B.status = 1;
+    </select>
+
+
 </mapper>
