@@ -20,6 +20,10 @@ public class RoomDAO {
         return sqlSession.selectList("room.selectRoomList", map);
     }
 
+    public List<HashMap<String, String>> selectProfileInRoomList(Map<String, String> map) {
+        return sqlSession.selectList("room.selectProfileInRoomList", map);
+    }
+
     public int insert(RoomVO vo) {
         return sqlSession.insert("room.insert", vo);
     }

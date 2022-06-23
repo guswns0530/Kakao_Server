@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,29 @@ class RoomDAOTest {
 
     @Autowired
     private RoomDAO roomDAO;
+
+    @Test
+    void selectRoomList() {
+        HashMap<String, String> map = new HashMap<>();
+
+        map.put("userId", "test1");
+
+        List<HashMap<String, String>> resultMap = roomDAO.selectRoomList(map);
+
+        System.out.println("resultMap = " + resultMap);
+    }
+
+    @Test
+    void selectProfileInRoomList() {
+        HashMap<String, String> map = new HashMap<>();
+
+        map.put("userId", "test1");
+        map.put("roomId", "3");
+
+        List<HashMap<String, String>> resultMap = roomDAO.selectProfileInRoomList(map);
+
+        System.out.println("resultMap = " + resultMap);
+    }
     @Test
     void insert() {
         RoomVO vo = new RoomVO();

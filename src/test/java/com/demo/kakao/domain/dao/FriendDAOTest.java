@@ -38,17 +38,27 @@ class FriendDAOTest {
 
         System.out.println("maps = " + maps);
     }
-
     @Test
     public void selectDeleteList() {
         Map<String, Object> map = new HashMap<>();
 
-        String userId = "admin";
+        String userId = "test1";
         map.put("userId", userId);
 
         List<Map<String, Object>> maps = friendDAO.selectDeleteList(map);
 
         System.out.println("maps = " + maps);
+    }
+
+    @Test
+    public void selectRoom() {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("friendId", "2");
+
+        Map<String, String> resultMap = friendDAO.selectRoom(map);
+
+        System.out.println("resultMap = " + resultMap);
     }
 
     @Test
@@ -91,5 +101,4 @@ class FriendDAOTest {
         System.out.println("result = " + result);
 
     }
-
 }

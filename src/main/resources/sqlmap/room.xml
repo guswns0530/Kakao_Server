@@ -51,6 +51,26 @@ type: {
           on A.room_id = B.room_id
         where user_id = #{userId}
           AND A.status = 1
-          AND B.status = 1;
+          AND B.status = 1
+    </select>
+
+    <select id="selectProfileInRoomList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        <include refid="common.CUTOFF_RS">
+            <property name="userId" value="userId"/>
+            <property name="target" value="from"/>
+            <property name="who" value="any"/>
+        </include>
+        select *
+        from (select
+            <include refid="common.CUTOFF_RS_SELECT_USER"/>
+            from kakao_rooms
+            join kakao_join_users
+            on kakao_rooms.room_id = kakao_join_users.room_id
+            join CUTOFF_RS B
+            on kakao_join_users.user_id = B.to_id
+            join kakao_users A
+            on A.user_id = kakao_join_users.user_id
+            where kakao_rooms.room_id = #{roomId})
+        where rownum &lt;= 4
     </select>
 </mapper>

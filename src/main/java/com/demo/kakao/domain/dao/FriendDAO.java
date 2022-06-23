@@ -26,6 +26,10 @@ public class FriendDAO {
         return sqlSession.selectList("friend.selectDeleteList", map);
     }
 
+    public Map<String, String> selectRoom(Map<String, Object> map) {
+        return sqlSession.selectOne("friend.selectRoom", map);
+    }
+
     public int insert(FriendVO vo) {
         return sqlSession.insert("friend.insert", vo);
     }

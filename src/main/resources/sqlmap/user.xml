@@ -8,9 +8,11 @@ status: {
 }
 -->
 <mapper namespace="user">
+    <!--  어드민 전용  -->
     <select id="selectList" resultType="java.util.HashMap">
         select * from kakao_users where status = 1
     </select>
+
 
     <select id="select" parameterType="java.lang.String" resultType="java.util.HashMap">
         select * from kakao_users
