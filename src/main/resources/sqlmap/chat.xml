@@ -3,7 +3,7 @@
 
 <mapper namespace="chat">
 
-    <select id="last_chat_select" parameterType="java.util.HashMap">
+    <select id="last_chat_select" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         select *
         from (select content
               from kakao_chats
@@ -11,6 +11,50 @@
               where room_id = #{roomId}
               order by kakao_chats.createAT desc)
         where rownum = 1;
+    </select>
+
+    <select id="" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+       <include refid="common.CUTOFF_RS">
+           <property name="userId" value="userId"/>
+           <property name="target" value="to"/>
+           <property name="who" value="to"/>
+       </include>
+        select
+            A.USER_ID,
+            A.NAME,
+            DECODE(B.CUTOFF_RS,'1' , A.PROVIDER , null) AS PROVIDER,
+            DECODE(B.CUTOFF_RS,'1' , B.NICKNAME , null) AS NICKNAME,
+            DECODE(B.CUTOFF_RS,'1' , A.PROFILE_IMAGE , null) AS PROFILE_IMAGE,
+            DECODE(B.CUTOFF_RS,'1' , A.BACKGROUND_IMAGE , null) AS BACKGROUND_IMAGE,
+            DECODE(B.CUTOFF_RS,'1' , A.CREATEAT , null) AS CREATEAT,
+            DECODE(B.CUTOFF_RS,'1' , A.UPDATEAT , null) AS UPDATEAT,
+        C.*,
+        B.CUTOFF_RS
+        from
+        (select *
+        from
+        (select chat_id, content, user_id, type, rank() over(order by kakao_chats.createAt desc) as seq, kakao_chats.createAT
+        from kakao_chats
+        join kakao_join_users
+        using(join_id)
+        where kakao_chats.room_id = 1
+        order by kakao_chats.createAt desc)
+        where seq <=
+        (select min(seq) seq -- 제일 최근에 들어온 날짜
+        from
+        (select chat_id, user_id, type, rank() over(order by kakao_chats.createAt desc) as seq
+        from kakao_chats
+        join kakao_join_users
+        using(join_id)
+        where kakao_chats.room_id = 1
+        order by kakao_chats.createAt desc)
+        where user_id = 'test1'
+        AND type = 2)) C
+        join kakao_users A
+        on A.user_id = C.user_id
+        left outer join CUTOFF_RS B
+        on B.to_id = A.user_id
+        where rownum between 1 and 20;
     </select>
 
     <insert id="insert">

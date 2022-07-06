@@ -118,22 +118,28 @@ AFTER INSERT or UPDATE ON kakao_join_users
 for each row
 begin
     if inserting then
-        insert into kakao_chats (chat_id, join_id, room_id, status, type, createAt) values (kakao_chats_seq.nextval, :new.join_id, :new.room_id, 1, 2, SYSDATE);
         insert into kakao_read_users(join_id, chat_id) values (:new.join_id, 
         (select chat_id from (select chat_id from kakao_chats join kakao_rooms using(room_id) where room_id = :new.room_id and join_id = :new.join_id order by kakao_chats.createAT desc) where rownum = 1));
     elsif updating then
         if :new.status = 1 then
-            insert into kakao_chats (chat_id, join_id, room_id, status, type, createAt) values (kakao_chats_seq.nextval, :new.join_id, :new.room_id, 1, 2, SYSDATE);
             insert into kakao_read_users(join_id, chat_id) values (:new.join_id, 
         (select chat_id from (select chat_id from kakao_chats join kakao_rooms using(room_id) where room_id = :new.room_id and join_id = :new.join_id order by kakao_chats.createAT desc) where rownum = 1));
         elsif :new.status = 2 then
-            insert into kakao_chats (chat_id, join_id, room_id, status, type, createAt) values (kakao_chats_seq.nextval, :new.join_id, :new.room_id, 1, 3, SYSDATE);
             delete kakao_read_users where join_id = :new.join_id;
         end if;
     end if;
 end;
 
 drop trigger join_users_update_trigger;
+
+CREATE trigger invite_kick_users_trigger
+AFTER INSERT ON kakao_join_users
+for each row
+begin
+    if :new.type = 2 then
+        
+    else if :new.type = 3 then
+end;
 
 --데이터 주입
 -- users
@@ -183,7 +189,7 @@ insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) valu
 insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 1, 1, 1, 1, '반갑습니다', SYSDATE);
 insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 1, 1, 1, 1, '안녕하세요', SYSDATE);
 
-insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 2, 1, 1, 1, '반갑습니다', SYSDATE);
+insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 2, 15, 1, 1, '반갑습니다', SYSDATE);
 insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 2, 1, 1, 1, '안녕하세요', SYSDATE);
 
 commit;
@@ -332,6 +338,7 @@ select
 A.USER_ID,
 A.NAME,
 DECODE(B.CUTOFF_RS,'1' , A.PROVIDER , null) AS PROVIDER,
+DECODE(B.CUTOFF_RS,'1' , B.NICKNAME , null) AS NICKNAME,
 DECODE(B.CUTOFF_RS,'1' , A.PROFILE_IMAGE , null) AS PROFILE_IMAGE,
 DECODE(B.CUTOFF_RS,'1' , A.BACKGROUND_IMAGE , null) AS BACKGROUND_IMAGE,
 DECODE(B.CUTOFF_RS,'1' , A.CREATEAT , null) AS CREATEAT,
