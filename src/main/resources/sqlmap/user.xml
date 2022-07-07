@@ -10,12 +10,28 @@ status: {
 <mapper namespace="user">
     <!--  어드민 전용  -->
     <select id="selectList" resultType="java.util.HashMap">
-        select * from kakao_users where status = 1
+        select
+            USER_ID,
+            NAME,
+            PROFILE_IMAGE,
+            BACKGROUND_IMAGE,
+            STATUS,
+            CREATEAT,
+            UPDATEAT
+            from kakao_users where status = 1
     </select>
 
     <!--  유저 전용 select 필요  -->
     <select id="select" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select * from kakao_users
+        select
+            USER_ID,
+            NAME,
+            PROFILE_IMAGE,
+            BACKGROUND_IMAGE,
+            STATUS,
+            CREATEAT,
+            UPDATEAT
+            from kakao_users
         where user_id = #{user_id} and status = 1
     </select>
 

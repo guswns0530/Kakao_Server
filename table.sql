@@ -111,6 +111,8 @@ drop sequence kakao_friends_seq;
 CREATE UNIQUE INDEX kakao_friends_index ON kakao_friends (from_id, to_id);
 CREATE UNIQUE INDEX kakao_join_users_index ON kakao_join_users (user_id, room_id);
 
+
+-- chats(type: invite) -> trigger 작동 (join_users, read_users insert)
 -- trigger
 -- 유저가 입장, 퇴장 트리거
 CREATE trigger join_users_update_trigger
@@ -129,17 +131,7 @@ begin
         end if;
     end if;
 end;
-
 drop trigger join_users_update_trigger;
-
-CREATE trigger invite_kick_users_trigger
-AFTER INSERT ON kakao_join_users
-for each row
-begin
-    if :new.type = 2 then
-        
-    else if :new.type = 3 then
-end;
 
 --데이터 주입
 -- users
@@ -366,3 +358,57 @@ from (select *
                 on B.to_id = A.user_id;
 --join CUTOFF_RS as B
 --on 
+
+-- getRoom start
+
+WITH CUTOFF_RS AS (select FR.*,
+case when (select count(*)
+from kakao_friends
+where STATUS = 2
+AND from_id = FR.from_id
+AND to_id = FR.to_id
+) <= 0 then '1'
+else '2' END AS CUTOFF_RS
+from kakao_friends FR
+where from_id = 'test1')
+
+select (
+    select LISTAGG(name, ', ') within group (order by name) as name
+    from
+        (
+        select nvl(DECODE(CUTOFF_RS.CUTOFF_RS, 1, nickname, null ), name) as name
+        from kakao_join_users
+        join kakao_users
+        on kakao_join_users.user_id = kakao_users.user_id
+        left outer join CUTOFF_RS
+        on kakao_users.user_id = CUTOFF_RS.to_id
+        where room_id = R.room_id
+        and kakao_users.user_id != JU.user_id
+        )
+) as name,
+R.room_id
+from kakao_join_users JU
+join kakao_rooms R
+on JU.room_id = R.room_id
+where JU.user_id = 'test1';
+
+/*
+kakao_join_users ('test1') -> kakao_rooms [ 1, 2, 3 ]
+
+select [1, 2, 3] -> {
+    kakao_join_users -> room_id = i
+}
+*/
+-- getRoom end
+
+
+select
+    B.ROOM_ID AS ROOM_ID,
+    B.NAME AS NAME,
+    B.TYPE AS TYPE
+from kakao_join_users A
+    join kakao_rooms B
+    on A.room_id = B.room_id
+where user_id = 'test1'
+    AND A.status = 1
+    AND B.status = 1;
