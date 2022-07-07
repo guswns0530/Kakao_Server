@@ -133,7 +133,7 @@ begin
 end;
 drop trigger join_users_update_trigger;
 
---데이터 주입
+-- 데이터 주입
 -- users
 insert into kakao_users (user_id, name, status, createAt) values ('test1', 'test1', 1, sysdate);
 insert into kakao_users (user_id, name, status, createAt) values ('test2', 'test2', 1, sysdate);
@@ -361,44 +361,6 @@ from (select *
 
 -- getRoom start
 
-WITH CUTOFF_RS AS (select FR.*,
-case when (select count(*)
-from kakao_friends
-where STATUS = 2
-AND from_id = FR.from_id
-AND to_id = FR.to_id
-) <= 0 then '1'
-else '2' END AS CUTOFF_RS
-from kakao_friends FR
-where from_id = 'test1')
-
-select (
-    select LISTAGG(name, ', ') within group (order by name) as name
-    from
-        (
-        select nvl(DECODE(CUTOFF_RS.CUTOFF_RS, 1, nickname, null ), name) as name
-        from kakao_join_users
-        join kakao_users
-        on kakao_join_users.user_id = kakao_users.user_id
-        left outer join CUTOFF_RS
-        on kakao_users.user_id = CUTOFF_RS.to_id
-        where room_id = R.room_id
-        and kakao_users.user_id != JU.user_id
-        )
-) as name,
-R.room_id
-from kakao_join_users JU
-join kakao_rooms R
-on JU.room_id = R.room_id
-where JU.user_id = 'test1';
-
-/*
-kakao_join_users ('test1') -> kakao_rooms [ 1, 2, 3 ]
-
-select [1, 2, 3] -> {
-    kakao_join_users -> room_id = i
-}
-*/
 -- getRoom end
 
 
@@ -412,3 +374,9 @@ from kakao_join_users A
 where user_id = 'test1'
     AND A.status = 1
     AND B.status = 1;
+    
+    
+    
+    
+    
+    
