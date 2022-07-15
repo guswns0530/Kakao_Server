@@ -187,6 +187,8 @@ insert into kakao_read_users  (user_id, room_id, createat) values('test3', 3, sy
 -- chats
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 1, 1, 1, '안녕하세요', SYSDATE);
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test2', 1, 1, 1, '반갑습니다', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 1, 1, 1, 'testMsg1', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test2', 1, 1, 1, 'testMsg2', SYSDATE);
 
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 2, 1, 1, '안녕하세요', SYSDATE);
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test3', 2, 1, 1, '반갑습니다', SYSDATE);
@@ -300,49 +302,6 @@ where kakao_chats.room_id = 1
 order by kakao_chats.createAt desc)
 where user_id = 'test1'
 and type = 2;
-
--- 모든 유저 채팅 -- 수정 필요 --
-WITH CUTOFF_RS AS (select FR.*,
-        case when (select count(*)
-    from kakao_friends
-    where STATUS = 2
-    AND ((from_id =FR.to_id and to_id = FR.from_id)
-            or
-        (from_id =FR.from_id and to_id = FR.to_id))
-        ) <= 0 then '1'
-        else '2' END AS CUTOFF_RS
-    from kakao_friends FR
-    where from_id = 'test1')
-select  
-A.USER_ID,
-A.NAME,
-DECODE(B.CUTOFF_RS,'1' , A.PROVIDER , null) AS PROVIDER,
-DECODE(B.CUTOFF_RS,'1' , B.NICKNAME , null) AS NICKNAME,
-DECODE(B.CUTOFF_RS,'1' , A.PROFILE_IMAGE , null) AS PROFILE_IMAGE,
-DECODE(B.CUTOFF_RS,'1' , A.BACKGROUND_IMAGE , null) AS BACKGROUND_IMAGE,
-DECODE(B.CUTOFF_RS,'1' , A.CREATEAT , null) AS CREATEAT,
-DECODE(B.CUTOFF_RS,'1' , A.UPDATEAT , null) AS UPDATEAT,
-C.*
-from (select *
-        from (select chat_id, content, user_id, type, rank() over(order by kakao_chats.createAt desc) as seq, kakao_chats.createAT
-                    from kakao_chats
-                    join kakao_join_users
-                    using(join_id)
-                where kakao_chats.room_id = 1
-                order by kakao_chats.createAt desc)
-        where seq <= (select seq 
-            from (select chat_id, user_id, type, rank() over(order by kakao_chats.createAt desc) as seq
-                    from kakao_chats
-                        join kakao_join_users
-                        using(join_id)
-                    where kakao_chats.room_id = 1
-                    order by kakao_chats.createAt desc)
-                where user_id = 'test1'
-                and type = 2) ) C
-                join kakao_users A
-                on A.user_id = C.user_id
-                left outer join CUTOFF_RS B
-                on B.to_id = A.user_id;
     
     
     
