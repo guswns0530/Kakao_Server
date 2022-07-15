@@ -22,3 +22,4 @@ JOIN CUTOFF_RS B
 ON A.user_id = B.TO_ID
 where B.status = 1
 and A.status = 1;
+

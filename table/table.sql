@@ -88,6 +88,7 @@ create table kakao_chats (
 create table kakao_read_users (
     user_id varchar2(255),
     room_id INTEGER,
+    chat_id INTEGER,
     createAt DATE,
     reserved1 varchar2(300),
     reserved2 varchar2(300),
@@ -167,22 +168,22 @@ insert into kakao_rooms (room_id, name, type, status, createAt) values (kakao_ro
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test1', 1, 1, sysdate);
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test2', 1, 1, sysdate);
 
-insert into kakao_read_users (user_id, room_id, createat) values('test1', 1, sysdate);
-insert into kakao_read_users (user_id, room_id, createat) values('test2', 1, sysdate);
+insert into kakao_read_users (user_id, room_id, chat_id, createat) values('test1', 1, 0, sysdate);
+insert into kakao_read_users (user_id, room_id, chat_id, createat) values('test2', 1, 0, sysdate);
 
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test1', 2, 1, sysdate);
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test3', 2, 1, sysdate);
 
-insert into kakao_read_users (user_id, room_id, createat) values('test1', 2, sysdate);
-insert into kakao_read_users (user_id, room_id, createat) values('test3', 2, sysdate);
+insert into kakao_read_users (user_id, room_id, chat_id, createat) values('test1', 2, 0, sysdate);
+insert into kakao_read_users (user_id, room_id, chat_id, createat) values('test3', 2, 0, sysdate);
 
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test1', 3, 1, sysdate);
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test2', 3, 1, sysdate);
 insert into kakao_join_users (user_id, room_id, status, createAt) values ('test3', 3, 1, sysdate);
 
-insert into kakao_read_users  (user_id, room_id, createat) values('test1', 3, sysdate);
-insert into kakao_read_users  (user_id, room_id, createat) values('test2', 3, sysdate);
-insert into kakao_read_users  (user_id, room_id, createat) values('test3', 3, sysdate);
+insert into kakao_read_users  (user_id, room_id, chat_id, createat) values('test1', 3, 0, sysdate);
+insert into kakao_read_users  (user_id, room_id, chat_id, createat) values('test2', 3, 0, sysdate);
+insert into kakao_read_users  (user_id, room_id, chat_id, createat) values('test3', 3, 0, sysdate);
 
 -- chats
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 1, 1, 1, '¾È³çÇÏ¼¼¿ä', SYSDATE);
@@ -192,6 +193,11 @@ insert into kakao_chats (chat_id, user_id, room_id, status, type, content, creat
 
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 2, 1, 1, '¾È³çÇÏ¼¼¿ä', SYSDATE);
 insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test3', 2, 1, 1, '¹İ°©½À´Ï´Ù', SYSDATE);
+
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 3, 1, 1, '¾È³çÇÏ¼¼¿ä', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test2', 3, 1, 1, '¹İ°©½À´Ï´Ù', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test3', 3, 1, 1, 'testMsg1', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 3, 1, 1, 'testMsg2', SYSDATE);
 
 commit;
 
@@ -302,6 +308,9 @@ where kakao_chats.room_id = 1
 order by kakao_chats.createAt desc)
 where user_id = 'test1'
 and type = 2;
+
+
+
     
     
     
