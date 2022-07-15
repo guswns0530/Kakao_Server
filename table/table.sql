@@ -4,6 +4,7 @@ drop table kakao_rooms;
 drop table kakao_chats;
 drop table kakao_friends;
 drop table kakao_read_users;
+drop table kakao_files;
 
 -- status: 현재 상태 ( 삭제, 방장 등등 )
 -- type: 타입( 파일, 이미지 / 1 대 1 채팅방, 단채 채팅방 )
@@ -56,7 +57,6 @@ create table kakao_rooms (
 
 --status: 1: 방장, 2: 보통, 3: 삭제
 create table kakao_join_users (
-    join_id INTEGER,
     user_id varchar2(255),
     room_id INTEGER,
     status INTEGER,
@@ -65,14 +65,13 @@ create table kakao_join_users (
     reserved1 VARCHAR2(300),
     reserved2 VARCHAR2(300),
     reserved3 VARCHAR2(300),
-    constraint kakao_join_users_pk primary key(room_id, user_id, join_id)
+    constraint kakao_join_users_pk primary key(room_id, user_id)
 );
 
 -- type { 1: 문자메시지, 2: 참가메시지, 3: 탈퇴메시지, 4: 파일(이미지, 동영상 등)}
-}
 create table kakao_chats (
     chat_id INTEGER,
-    join_id INTEGER,
+    user_id VARCHAR2(255),
     room_id INTEGER,
     status INTEGER,
     type INTEGER,
@@ -82,72 +81,70 @@ create table kakao_chats (
     reserved1 VARCHAR2(300),
     reserved2 VARCHAR2(300),
     reserved3 VARCHAR2(300),
-    constraint kakao_chats_pk primary key(join_id, chat_id)
+    constraint kakao_chats_pk primary key(room_id, user_id, chat_id)
 );
 
 -- 읽은 사람 메시지 
 create table kakao_read_users (
-    join_id INTEGER,
-    chat_id INTEGER,
+    user_id varchar2(255),
+    room_id INTEGER,
+    createAt DATE,
     reserved1 varchar2(300),
     reserved2 varchar2(300),
     reserved3 varchar2(300),
-    constraint kakao_read_users_pk primary key(join_id)
+    constraint kakao_read_users_pk primary key(room_id, user_id)
+);
+
+-- 파일 
+create table kakao_files(
+    file_id INTEGER,
+    user_id VARCHAR2(266),
+    original_name VARCHAR2(260),
+    original_ext VARCHAR2(8),
+    file_name VARCHAR2(260),
+    createAt date,
+    reserved1 VARCHAR2(300),
+    reserved2 VARCHAR2(300),
+    reserved3 VARCHAR2(300),
+    constraint kakao_files_pk primary key (user_id, file_id)
 );
 
 -- sequence
 create sequence kakao_friends_seq start with 1 increment by 1 nocycle nocache;
 create sequence kakao_rooms_seq start with 1 increment by 1 nocycle nocache;
-create sequence kakao_join_users_seq start with 1 increment by 1 nocycle nocache;
 create sequence kakao_chats_seq start with 1 increment by 1 nocycle nocache;
+create sequence kakao_files_seq start with 1 increment by 1 nocycle nocache;
 
 -- sequence
-drop sequence kakao_join_users_seq;
 drop sequence kakao_rooms_seq;
 drop sequence kakao_chats_seq;
 drop sequence kakao_friends_seq;
+drop sequence kakao_files_seq;
 
 -- unique index
 CREATE UNIQUE INDEX kakao_friends_index ON kakao_friends (from_id, to_id);
-CREATE UNIQUE INDEX kakao_join_users_index ON kakao_join_users (user_id, room_id);
-
 
 -- chats(type: invite) -> trigger 작동 (join_users, read_users insert)
 -- trigger
 -- 유저가 입장, 퇴장 트리거
-CREATE trigger join_users_update_trigger
-AFTER INSERT or UPDATE ON kakao_join_users
-for each row
-begin
-    if inserting then
-        insert into kakao_read_users(join_id, chat_id) values (:new.join_id, 
-        (select chat_id from (select chat_id from kakao_chats join kakao_rooms using(room_id) where room_id = :new.room_id and join_id = :new.join_id order by kakao_chats.createAT desc) where rownum = 1));
-    elsif updating then
-        if :new.status = 1 then
-            insert into kakao_read_users(join_id, chat_id) values (:new.join_id, 
-        (select chat_id from (select chat_id from kakao_chats join kakao_rooms using(room_id) where room_id = :new.room_id and join_id = :new.join_id order by kakao_chats.createAT desc) where rownum = 1));
-        elsif :new.status = 2 then
-            delete kakao_read_users where join_id = :new.join_id;
-        end if;
-    end if;
-end;
-drop trigger join_users_update_trigger;
+
+
 
 -- 데이터 주입
 -- users
-insert into kakao_users (user_id, name, status, createAt) values ('test1', 'test1', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test2', 'test2', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test3', 'test3', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test4', 'test4', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test5', 'test5', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test6', 'test6', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test7', 'test7', 1, sysdate);
-insert into kakao_users (user_id, name, status, createAt) values ('test8', 'test8', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test1', 'test1', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test2', 'test2', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test3', 'test3', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test4', 'test4', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test5', 'test5', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test6', 'test6', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test7', 'test7', '이미지', '이미지', 1, sysdate);
+insert into kakao_users (user_id, name, profile_image, background_image, status, createAt) values ('test8', 'test8', '이미지', '이미지', 1, sysdate);
 
 --friends
-insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test2', '테스트2', 1, sysdate);
 insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test3', '테스트3', 1, sysdate);
 insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test4', '테스트4', 1, sysdate);
+insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test2', '테스트2', 1, sysdate);
 insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test5', '테스트5', 1, sysdate);
 insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test6', '테스트6', 1, sysdate);
 insert into kakao_friends (friend_id, from_id, to_id, nickname, status, createAt) values(kakao_friends_seq.nextval, 'test1', 'test7', '테스트7', 1, sysdate);
@@ -167,44 +164,34 @@ insert into kakao_rooms (room_id, name, type, status, createAt) values (kakao_ro
 insert into kakao_rooms (room_id, name, type, status, createAt) values (kakao_rooms_seq.nextval, '', 2, '1', sysdate);
 
 -- join_users
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test1', 1, 1, sysdate);
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test2', 1, 1, sysdate);
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test1', 1, 1, sysdate);
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test2', 1, 1, sysdate);
 
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test1', 2, 1, sysdate);
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test3', 2, 1, sysdate);
+insert into kakao_read_users (user_id, room_id, createat) values('test1', 1, sysdate);
+insert into kakao_read_users (user_id, room_id, createat) values('test2', 1, sysdate);
 
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test1', 3, 1, sysdate);
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test2', 3, 1, sysdate);
-insert into kakao_join_users ( join_id, user_id, room_id, status, createAt) values ( kakao_join_users_seq.nextval, 'test3', 3, 1, sysdate);
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test1', 2, 1, sysdate);
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test3', 2, 1, sysdate);
+
+insert into kakao_read_users (user_id, room_id, createat) values('test1', 2, sysdate);
+insert into kakao_read_users (user_id, room_id, createat) values('test3', 2, sysdate);
+
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test1', 3, 1, sysdate);
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test2', 3, 1, sysdate);
+insert into kakao_join_users (user_id, room_id, status, createAt) values ('test3', 3, 1, sysdate);
+
+insert into kakao_read_users  (user_id, room_id, createat) values('test1', 3, sysdate);
+insert into kakao_read_users  (user_id, room_id, createat) values('test2', 3, sysdate);
+insert into kakao_read_users  (user_id, room_id, createat) values('test3', 3, sysdate);
 
 -- chats
-insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 1, 1, 1, 1, '반갑습니다', SYSDATE);
-insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 1, 1, 1, 1, '안녕하세요', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 1, 1, 1, '안녕하세요', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test2', 1, 1, 1, '반갑습니다', SYSDATE);
 
-insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 2, 15, 1, 1, '반갑습니다', SYSDATE);
-insert into kakao_chats (chat_id, join_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 2, 1, 1, 1, '안녕하세요', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test1', 2, 1, 1, '안녕하세요', SYSDATE);
+insert into kakao_chats (chat_id, user_id, room_id, status, type, content, createAt) values (kakao_chats_seq.nextval, 'test3', 2, 1, 1, '반갑습니다', SYSDATE);
 
 commit;
-
--- select
-with last_chat_id as 
-(
-    select * 
-    from (select chat_id 
-        from kakao_chats 
-        join kakao_rooms using(room_id) 
-        where room_id = 1 
-        order by kakao_chats.createAT desc) 
-    where rownum = 1
-)
-
-select *
-from (select content
-    from kakao_chats 
-    join kakao_rooms using(room_id) 
-    where room_id = 1 
-    order by kakao_chats.createAT desc) 
-where rownum = 1;
 
 -- 유저 이미지 불러오기 (수정 권장)
 select *
@@ -314,7 +301,7 @@ order by kakao_chats.createAt desc)
 where user_id = 'test1'
 and type = 2;
 
--- 모든 유저 채팅 -- 수정 필요 *****
+-- 모든 유저 채팅 -- 수정 필요 --
 WITH CUTOFF_RS AS (select FR.*,
         case when (select count(*)
     from kakao_friends
@@ -356,24 +343,6 @@ from (select *
                 on A.user_id = C.user_id
                 left outer join CUTOFF_RS B
                 on B.to_id = A.user_id;
---join CUTOFF_RS as B
---on 
-
--- getRoom start
-
--- getRoom end
-
-
-select
-    B.ROOM_ID AS ROOM_ID,
-    B.NAME AS NAME,
-    B.TYPE AS TYPE
-from kakao_join_users A
-    join kakao_rooms B
-    on A.room_id = B.room_id
-where user_id = 'test1'
-    AND A.status = 1
-    AND B.status = 1;
     
     
     
